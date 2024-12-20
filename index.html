@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survey Form</title>
+    <style>
+        /* نفس تنسيقك الحالي */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #6a11cb, #2575fc); color: white; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .form-container { width: 100%; max-width: 800px; background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 16px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); }
+        h1 { text-align: center; margin-bottom: 20px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; }
+        input[type="text"] { width: 100%; padding: 10px; border: none; border-radius: 4px; font-size: 16px; }
+        .question { margin-bottom: 20px; }
+        .question-options { display: flex; gap: 10px; flex-wrap: wrap; }
+        .option { flex: 1 1 calc(33.333% - 10px); background-color: #ffffff20; padding: 15px; text-align: center; border-radius: 8px; cursor: pointer; transition: background-color 0.3s, transform 0.2s; position: relative; }
+        .option input { position: absolute; opacity: 0; cursor: pointer; }
+        .option:hover, .option.selected { background-color: #4CAF50; color: white; transform: scale(1.05); }
+        button { display: block; width: 100%; padding: 12px; background-color: #4CAF50; color: white; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; transition: background-color 0.3s ease; }
+        button:hover { background-color: #45a049; }
+        .success-message { display: none; text-align: center; margin-top: 20px; color: #4CAF50; font-size: 18px; }
+
+        /* تحسين التوافق مع الشاشات الصغيرة */
+        @media (max-width: 768px) {
+            .form-container {
+                padding: 15px;
+            }
+            .question-options {
+                flex-direction: column;
+            }
+            .option {
+                flex: 1 1 100%;
+                margin-bottom: 10px;
+            }
+            button {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Survey Form</h1>
+        <form id="surveyForm">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" placeholder="Enter your name" required>
+            </div>
+
+            <!-- Question 1 -->
+            <div class="question">
+                <label>1. What is your favorite color?</label>
+                <div class="question-options">
+                    <div class="option"><input type="radio" name="q1" value="Red" required> Red</div>
+                    <div class="option"><input type="radio" name="q1" value="Blue" required> Blue</div>
+                    <div class="option"><input type="radio" name="q1" value="Green" required> Green</div>
+                </div>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="question">
+                <label>2. What is your favorite animal?</label>
+                <div class="question-options">
+                    <div class="option"><input type="radio" name="q2" value="Dog" required> Dog</div>
+                    <div class="option"><input type="radio" name="q2" value="Cat" required> Cat</div>
+                    <div class="option"><input type="radio" name="q2" value="Bird" required> Bird</div>
+                </div>
+            </div>
+
+            <!-- More questions -->
+            <div class="question">
+                <label>3. Favorite hobby?</label>
+                <div class="question-options">
+                    <div class="option"><input type="radio" name="q3" value="Reading" required> Reading</div>
+                    <div class="option"><input type="radio" name="q3" value="Sports" required> Sports</div>
+                    <div class="option"><input type="radio" name="q3" value="Music" required> Music</div>
+                </div>
+            </div>
+
+            <div class="question">
+                <label>4. Favorite food?</label>
+                <div class="question-options">
+                    <div class="option"><input type="radio" name="q4" value="Pizza" required> Pizza</div>
+                    <div class="option"><input type="radio" name="q4" value="Salad" required> Salad</div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit">Submit</button>
+        </form>
+
+        <!-- Success Message -->
+        <div class="success-message" id="successMessage">
+            Thank you for submitting the form!
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('surveyForm');
+        const successMessage = document.getElementById('successMessage');
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();  // Prevent form from submitting the traditional way
+
+            // Collect form data
+            const formData = new FormData(form);
+            const entries = Object.fromEntries(formData.entries());
+
+            // Display a success message
+            successMessage.style.display = 'block';
+
+            // Log the data (can be replaced with sending to server)
+            console.log('Form Data:', entries);
+
+            // إرسال البيانات إلى السيرفر
+            fetch('/submit-survey', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(entries),
+            })
+            .then(response => response.text())
+            .then(data => {
+                console.log(data);
+                alert('Form submitted successfully!');
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        // Highlight selected option
+        const options = document.querySelectorAll('.option');
+        options.forEach(option => {
+            option.addEventListener('click', () => {
+                const input = option.querySelector('input');
+                if (input) input.checked = true;
+
+                // Clear previous selected class
+                option.parentElement.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+                option.classList.add('selected');
+            });
+        });
+    </script>
+</body>
+</html>
